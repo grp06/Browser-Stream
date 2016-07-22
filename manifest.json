@@ -12,7 +12,7 @@
   },
   "background": {
       "scripts": [
-          "background.js"
+          "firebase.js","background.js"
       ]
   },
   "content_scripts": [

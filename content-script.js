@@ -5,22 +5,21 @@ var rootRef = new Firebase("https://search-feed-35574.firebaseio.com/");
 
 
 
-
 //upon installing the extension, prompt the user to sign into google
 //once authenticated, on every page refresh, we should push the URL to the DB
 
 //chrome.tabs.onUpdated.addListener(function callback)
 //when a tab is updated, check to see if the user is authenticated?
 
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
+// chrome.runtime.onMessage.addListener(
+//     function(request, sender, sendResponse) {
 
-        request.accountData.url = url;
-        rootRef.push(request)
-        //figure out if this user has entries in the DB already
-        //just push the link information onto the "links" node of the db object
-        //if not, push a ref (to the right place)
-    });
+//         request.accountData.url = url;
+//         rootRef.push(request)
+//         //figure out if this user has entries in the DB already
+//         //just push the link information onto the "links" node of the db object
+//         //if not, push a ref (to the right place)
+//     });
 
 
 

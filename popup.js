@@ -23,6 +23,7 @@ firebase.initializeApp(config);
  * When signed in, we also authenticate to the Firebase Realtime Database.
  */
 function initApp() {
+  console.log('app initi')
   // Listen for auth state changes.
   // [START authstatelistener]
   firebase.auth().onAuthStateChanged(function(user) {
@@ -63,9 +64,9 @@ function initApp() {
       document.getElementById('quickstart-account-details').textContent = userDataToText;
 
       chrome.runtime.sendMessage({accountData: accountData}, function(response) {
-        console.log(response.farewell);
+        // console.log(response.farewell);
       });
-
+      localStorage.setItem("userIsAuthenticated", true)
     
     } else {
       // Let's try to get a Google auth token programmatically.
@@ -73,7 +74,8 @@ function initApp() {
       // [START_EXCLUDE]
       document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
       document.getElementById('quickstart-account-details').textContent = 'null';
-      // [END_EXCLUDE]
+      localStorage.setItem("userIsAuthenticated", false)
+
     }
   });
   // [END authstatelistener]
