@@ -67,6 +67,7 @@ function initApp() {
         // console.log(response.farewell);
       });
       localStorage.setItem("userIsAuthenticated", true)
+      localStorage.setItem("uid", uid)
     
     } else {
       // Let's try to get a Google auth token programmatically.
