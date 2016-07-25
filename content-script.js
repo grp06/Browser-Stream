@@ -1,8 +1,6 @@
 var url = window.location.href;
 console.log('url is ', url)
 
-var rootRef = new Firebase("https://search-feed-35574.firebaseio.com/");
-
 chrome.runtime.sendMessage({url: url}, function(response) {
   // console.log(response.farewell);
 });
