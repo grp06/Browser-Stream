@@ -1,6 +1,9 @@
 var rootRef = new Firebase("https://search-feed-35574.firebaseio.com/");
 
-if (localStorage.userIsAuthenticated) {
+
+var userIsAuthenticated = localStorage.userIsAuthenticated;
+console.log('userIsAuthenticated = ' + localStorage.userIsAuthenticated)
+if (userIsAuthenticated == "true") {
     rootRef.once('value', function(snapshot) {
         if (snapshot.hasChild('publicLinks')) {
             console.log('publicLinks already created')
@@ -10,23 +13,45 @@ if (localStorage.userIsAuthenticated) {
             console.log('public links just got made')
         }
     })
-    console.log('user is authenticaled')
+
+    console.log('user is authenticated')
     chrome.runtime.onMessage.addListener(
         //listen for messages
         function(request, sender, sendResponse) {
             //url is coming in from a content script, use localStorage.uid to make database call
             if (request.url) {
-                console.log('message coming from content script')
                 var uid = localStorage.uid;
                 var url = request.url;
+                var title = request.title;
+                
+                chrome.storage.local.get('storageObject',function(result){
+                  var publicLinksRef = rootRef.child('publicLinks');
+                  
+                  var displayName = result.storageObject.displayName
+                  var email = result.storageObject.email
+                  var photoUrl = result.storageObject.photoUrl
+                  var favicon = 'https://plus.google.com/_/favicon?domain=';
+                  var faviconUrl = favicon + url;
+                  var timestamp = Date.now();
+                  var negTimestamp = -timestamp;
 
-                var userRef = rootRef.child(uid);
-                var linksRef = userRef.child('visitedLinks');
 
-                linksRef.push(url)
+                  if(title == ""){
+                  	console.log('empty title yo! we gonn skip the insert')
+                  } else {
+                  	publicLinksRef.push({
+                  		url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp 
+                  	});
 
-                var publicLinksRef = rootRef.child('publicLinks');
-                publicLinksRef.push(url);
+
+
+                  	var userRef = rootRef.child(uid);
+                  	var linksRef = userRef.child('visitedLinks');
+
+                  	linksRef.push({url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp})
+                  }
+                  
+                })
 
 
 
@@ -53,11 +78,7 @@ if (localStorage.userIsAuthenticated) {
                 })
             }
 
-            //figure out if this user has entries in the DB already
-            //just push the link information onto the "links" node of the db object
-            //if not, push a ref (to the right place)
-            // console.log(sender)
-        });
+        }, false);
 } else {
     console.log('user isnt authenticated')
 }

@@ -32,18 +32,43 @@ function initApp() {
       var displayName = user.displayName;
       var email = user.email;
       var emailVerified = user.emailVerified;
-      var photoURL = user.photoURL;
+      var photoUrl = user.photoURL;
       var isAnonymous = user.isAnonymous;
       var uid = user.uid;
       var refreshToken = user.refreshToken;
       var providerData = user.providerData;
+
+      console.log('user = ', user)
+      // var storageObject = {
+      //   displayName, email, photoUrl, uid, refreshToken, providerData
+      // }      
+      // chrome.storage.local.set(storageObject)
+
+
+
+      var storageObject = {};
+
+      storageObject['displayName'] = displayName
+      storageObject['email'] = email
+      storageObject['photoUrl'] = photoUrl;
+      storageObject['uid'] = uid;
+      storageObject['refreshToken'] = refreshToken;
+      storageObject['photoUrl'] = photoUrl;
+      console.log(storageObject)
+      var key = 'storageObject';
+
+      chrome.storage.local.set({ key : storageObject });
+
+
+
+
       // [START_EXCLUDE]
       document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
       var userDataToText = JSON.stringify({
         displayName: displayName,
         email: email,
         emailVerified: emailVerified,
-        photoURL: photoURL,
+        photoUrl: photoUrl,
         isAnonymous: isAnonymous,
         uid: uid,
         refreshToken: refreshToken,
@@ -54,7 +79,7 @@ function initApp() {
         displayName: displayName,
         email: email,
         emailVerified: emailVerified,
-        photoURL: photoURL,
+        photoUrl: photoUrl,
         isAnonymous: isAnonymous,
         uid: uid,
         refreshToken: refreshToken,
@@ -66,8 +91,9 @@ function initApp() {
       chrome.runtime.sendMessage({accountData: accountData}, function(response) {
         // console.log(response.farewell);
       });
-      localStorage.setItem("userIsAuthenticated", true)
-      localStorage.setItem("uid", uid)
+      localStorage.setItem("userIsAuthenticated", true);
+      localStorage.setItem("accountData", accountData);
+      console.log('localStorage accountData set');
     
     } else {
       // Let's try to get a Google auth token programmatically.
@@ -112,6 +138,42 @@ function startAuth(interactive) {
       console.error('The OAuth Token was null');
     }
   });
+}
+
+function signOut() {
+    console.log('sign out clicked')
+    firebase.auth().onAuthStateChanged(function(user) {
+        console.log('page just loaded, onAuthStateChanged running')
+        if (user) {
+
+
+
+            var refreshToken = user.refreshToken;
+            chrome.identity.removeCachedAuthToken({
+                token: refreshToken
+            }, function() {
+                document.getElementById('quickstart-account-details').textContent = 'null';
+                localStorage.setItem("userIsAuthenticated", false);
+                localStorage.setItem("refreshToken", null);
+             
+                console.log('token removed')
+
+            });
+
+
+
+        } else {
+            // Let's try to get a Google auth token programmatically.
+            startAuth(false);
+            // [START_EXCLUDE]
+            document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
+            document.getElementById('quickstart-account-details').textContent = 'null';
+            localStorage.setItem("userIsAuthenticated", false);
+            localStorage.setItem("refreshToken", null);
+
+
+        }
+    });
 }
 
 /**

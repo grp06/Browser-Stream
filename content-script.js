@@ -1,7 +1,10 @@
 var url = window.location.href;
 console.log('url is ', url)
 
-chrome.runtime.sendMessage({url: url}, function(response) {
+chrome.runtime.sendMessage({
+	url: url,
+	title: document.title
+}, function(response) {
   // console.log(response.farewell);
 });
 

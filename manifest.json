@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Social Browser History",
-  "description": "Why must we hold secret our Internet browsing habits?",
-  "version": "1.0",
+  "name": "Browser Stream",
+  "description": "Stream your browser history. Creep on your friends. What do you have to hide?",
+  "version": "3.2",
   "icons": {
     "128": "firebase.png"
   },
@@ -26,7 +26,7 @@
       }
   ],
   "permissions": [
-    "identity", "activeTab", "tabs"
+    "identity", "activeTab", "tabs", "storage"
   ],
   "content_security_policy":"script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com; object-src 'self'",
   "oauth2": {
