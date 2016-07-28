@@ -1,10 +1,10 @@
 // TODO(DEVELOPER): Change the values below using values from the initialization snippet: Firebase Console > Overview > Add Firebase to your web app.
 // Initialize Firebase
 var config = {
-  apiKey: "AIzaSyBZtw9sDtZKhI5Q6w--kwulEpv6d8UPUwo",
-  authDomain: "search-feed-35574.firebaseapp.com",
-  databaseURL: "https://search-feed-35574.firebaseio.com",
-  storageBucket: "search-feed-35574.appspot.com",
+    apiKey: "AIzaSyBZtw9sDtZKhI5Q6w--kwulEpv6d8UPUwo",
+    authDomain: "search-feed-35574.firebaseapp.com",
+    databaseURL: "https://search-feed-35574.firebaseio.com",
+    storageBucket: "search-feed-35574.appspot.com",
 };
 firebase.initializeApp(config);
 
@@ -23,91 +23,55 @@ firebase.initializeApp(config);
  * When signed in, we also authenticate to the Firebase Realtime Database.
  */
 function initApp() {
-  console.log('app initi')
-  // Listen for auth state changes.
-  // [START authstatelistener]
-  firebase.auth().onAuthStateChanged(function(user) {
-    if (user) {
-      // User is signed in.
-      var displayName = user.displayName;
-      var email = user.email;
-      var emailVerified = user.emailVerified;
-      var photoUrl = user.photoURL;
-      var isAnonymous = user.isAnonymous;
-      var uid = user.uid;
-      var refreshToken = user.refreshToken;
-      var providerData = user.providerData;
+    console.log('app initi')
+    // Listen for auth state changes.
+    // [START authstatelistener]
+    firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+            console.log('user exists')
+            // User is signed in.
+            var displayName = user.displayName;
+            var email = user.email;
+            var emailVerified = user.emailVerified;
+            var photoUrl = user.photoURL;
+            var isAnonymous = user.isAnonymous;
+            var uid = user.uid;
+            var refreshToken = user.refreshToken;
+            var providerData = user.providerData;
 
-      console.log('user = ', user)
-      // var storageObject = {
-      //   displayName, email, photoUrl, uid, refreshToken, providerData
-      // }      
-      // chrome.storage.local.set(storageObject)
-
-
-
-      var storageObject = {};
-
-      storageObject['displayName'] = displayName
-      storageObject['email'] = email
-      storageObject['photoUrl'] = photoUrl;
-      storageObject['uid'] = uid;
-      storageObject['refreshToken'] = refreshToken;
-      storageObject['photoUrl'] = photoUrl;
-      console.log(storageObject)
-      var key = 'storageObject';
-
-      chrome.storage.local.set({ key : storageObject });
+            localStorage.setItem("uid", uid);
+            localStorage.setItem("email", email);
+            localStorage.setItem("displayName", displayName);
+            localStorage.setItem("photoUrl", photoUrl);
+            localStorage.setItem("refreshToken", refreshToken);
+            localStorage.setItem("userIsAuthenticated", true);
 
 
+     
+
+            console.log('hiiii')
 
 
-      // [START_EXCLUDE]
-      document.getElementById('quickstart-sign-in-status').textContent = 'Signed in';
-      var userDataToText = JSON.stringify({
-        displayName: displayName,
-        email: email,
-        emailVerified: emailVerified,
-        photoUrl: photoUrl,
-        isAnonymous: isAnonymous,
-        uid: uid,
-        refreshToken: refreshToken,
-        providerData: providerData
-      }, null, '  ');
+            chrome.runtime.sendMessage({
+                message: user
+            }, function(response) {
+                // console.log(response.farewell);
+            });
 
-      var accountData = {
-        displayName: displayName,
-        email: email,
-        emailVerified: emailVerified,
-        photoUrl: photoUrl,
-        isAnonymous: isAnonymous,
-        uid: uid,
-        refreshToken: refreshToken,
-        providerData: providerData
-      }
+            console.log('sdfsdf')
 
-      document.getElementById('quickstart-account-details').textContent = userDataToText;
 
-      chrome.runtime.sendMessage({accountData: accountData}, function(response) {
-        // console.log(response.farewell);
-      });
-      localStorage.setItem("userIsAuthenticated", true);
-      localStorage.setItem("accountData", accountData);
-      console.log('localStorage accountData set');
-    
-    } else {
-      // Let's try to get a Google auth token programmatically.
-      startAuth(false);
-      // [START_EXCLUDE]
-      document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
-      document.getElementById('quickstart-account-details').textContent = 'null';
-      localStorage.setItem("userIsAuthenticated", false)
+        } else {
+            // Let's try to get a Google auth token programmatically.
+            startAuth(false);
+            // [START_EXCLUDE]
+            document.getElementById('quickstart-account-details').textContent = 'null';
+            localStorage.setItem("userIsAuthenticated", false)
 
-    }
-  });
-  // [END authstatelistener]
-
-  document.getElementById('quickstart-button').addEventListener('click', startSignIn, false);
+        }
+    });
+    // [END authstatelistener]
+    document.getElementById('quickstart-button').addEventListener('click', startSignIn, false);
 }
 
 /**
@@ -115,78 +79,89 @@ function initApp() {
  * @param{boolean} interactive True if the OAuth flow should request with an interactive mode.
  */
 function startAuth(interactive) {
-  // Request an OAuth token from the Chrome Identity API.
-  chrome.identity.getAuthToken({ interactive: !!interactive }, function(token) {
-    if (chrome.runtime.lastError && !interactive) {
-      console.log('It was not possible to get a token programmatically.');
-      // Show the sign-in button
-      document.getElementById('quickstart-button').disabled = false;
-    } else if(chrome.runtime.lastError) {
-      console.error(chrome.runtime.lastError);
-    } else if (token) {
-      // Authrorize Firebase with the OAuth Access Token.
-      var credential = firebase.auth.GoogleAuthProvider.credential(null, token);
-      firebase.auth().signInWithCredential(credential).catch(function(error) {
-        // The OAuth token might have been invalidated. Lets' remove it from cache.
-        if (error.code === 'auth/invalid-credential') {
-          chrome.identity.removeCachedAuthToken({token: token}, function() {
-            startAuth(interactive);
-          });
-        }
-      });
-    } else {
-      console.error('The OAuth Token was null');
-    }
-  });
-}
-
-function signOut() {
-    console.log('sign out clicked')
-    firebase.auth().onAuthStateChanged(function(user) {
-        console.log('page just loaded, onAuthStateChanged running')
-        if (user) {
-
-
-
-            var refreshToken = user.refreshToken;
-            chrome.identity.removeCachedAuthToken({
-                token: refreshToken
-            }, function() {
-                document.getElementById('quickstart-account-details').textContent = 'null';
-                localStorage.setItem("userIsAuthenticated", false);
-                localStorage.setItem("refreshToken", null);
-             
-                console.log('token removed')
-
+    // Request an OAuth token from the Chrome Identity API.
+    chrome.identity.getAuthToken({
+        interactive: !!interactive
+    }, function(token) {
+        if (chrome.runtime.lastError && !interactive) {
+            console.log('It was not possible to get a token programmatically.');
+            // Show the sign-in button
+            document.getElementById('quickstart-button').disabled = false;
+        } else if (chrome.runtime.lastError) {
+            console.error(chrome.runtime.lastError);
+        } else if (token) {
+            // Authrorize Firebase with the OAuth Access Token.
+            var credential = firebase.auth.GoogleAuthProvider.credential(null, token);
+            firebase.auth().signInWithCredential(credential).catch(function(error) {
+                // The OAuth token might have been invalidated. Lets' remove it from cache.
+                if (error.code === 'auth/invalid-credential') {
+                    chrome.identity.removeCachedAuthToken({
+                        token: token
+                    }, function() {
+                        startAuth(interactive);
+                    });
+                }
             });
-
-
-
         } else {
-            // Let's try to get a Google auth token programmatically.
-            startAuth(false);
-            // [START_EXCLUDE]
-            document.getElementById('quickstart-sign-in-status').textContent = 'Signed out';
-            document.getElementById('quickstart-account-details').textContent = 'null';
-            localStorage.setItem("userIsAuthenticated", false);
-            localStorage.setItem("refreshToken", null);
-
-
+            console.error('The OAuth Token was null');
         }
     });
 }
 
-/**
- * Starts the sign-in process.
- */
+function change() {
+    var elem = document.getElementById("button-1");
+    var publicBrowsing = localStorage.publicBrowsing;
+    var publicStatus = document.getElementById('public-status')
+
+    if (elem.value == "Browse Privately") {
+      elem.value = "Browse Publicly";
+      localStorage.setItem("publicBrowsing", false);
+      publicStatus.innerHTML = '';
+      publicStatus.innerHTML = 'Currently Browsing Privately';
+      publicStatus.className = "red"
+
+      console.log('localStorage public browsing is false')
+    } else {
+      elem.value = "Browse Privately";
+      localStorage.setItem("publicBrowsing", true);
+      publicStatus.innerHTML = '';
+      publicStatus.innerHTML = 'Currently Browsing Publicly';
+      publicStatus.className = "green"
+      console.log('localStorage public browsing is true')
+
+    }
+
+}
+
+
 function startSignIn() {
-  document.getElementById('quickstart-button').disabled = true;
-  startAuth(true);
+    document.getElementById('quickstart-button').disabled = true;
+    startAuth(true);
 }
 
 window.onload = function() {
-  var url = window.location.href;
-  console.log('url is ' , url)
-  initApp();
+    var url = window.location.href;
+    console.log('url is ', url)
+    initApp();
+
+    var publicBrowsing = localStorage.publicBrowsing;
+    var elem = document.getElementById("button-1");
+    var publicStatus = document.getElementById('public-status')
+    if(publicBrowsing == "true"){
+      elem.value = "Browse Privately";
+      var text = document.createTextNode('Currently Browsing Publicly');
+      publicStatus.appendChild(text);
+      publicStatus.className = "green"
+
+    } else {
+      elem.value = "Browse Publicly";
+      var text = document.createTextNode('Currently Browsing Privately');
+      publicStatus.appendChild(text);
+      publicStatus.className = "red"
+
+    }
+    document.getElementById('button-1').addEventListener('click', change, false);
+
+
 
 };
