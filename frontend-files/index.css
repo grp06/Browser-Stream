@@ -1,0 +1,125 @@
+*{
+	margin: 0;
+	padding: 0;
+}
+
+
+body {
+	background-color: rgba(0,0,0,.03);
+	font-family: 'Libre Baskerville', serif;
+	font-size: 12px;
+
+}
+
+#total-links-container {
+
+}
+
+.stats-box {
+	width: 200px;
+	border: 1px solid #ccc;
+	background-color: white;
+	position: absolute;
+	box-shadow: 1px 1px 5px #ccc;
+	padding: 10px 5px;
+	font-size: 1em;
+}
+
+#total-clicks-container {
+
+}
+
+.top-nav {
+	display: flex;
+	width: 100%;
+	justify-content: center;
+	align-items: center;
+}
+
+.browser-stream {
+	font-size: 2.5em;
+	text-align: center;
+	width: 100%;
+	background-color: white;
+}
+
+#container {
+	display: flex;
+	flex-wrap: wrap;
+
+}
+
+.site-block {
+	display: flex;
+	margin: 5px 10px;
+	padding: 15px;
+	background-color: rgba(255,255,255,.9);
+	width: 100%;
+	border-radius: 2px;
+	border-bottom: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+	width: 50%;
+	margin-left: 25%;
+}
+
+.site-block:first-child {
+	margin-top: 10px;
+}
+
+.site-block:last-child {
+	margin-bottom: 10px;
+}
+
+.left-side {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.right-side {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	margin-left: 5px;
+
+}
+
+.prof-pic {
+
+}
+
+.prof-pic img {
+	height: 45px;
+	border-radius: 50%
+}
+
+.full-name {
+
+}
+
+.site-title {
+	align-self: flex-end;
+	margin-left: 5px;
+}
+
+.site-title a {
+	color: black;
+	font-size: 14px;
+}
+
+.favicon {
+	align-self: flex-end;
+
+}
+
+.favicon img {
+
+}
+
+.time-posted {
+	flex-basis: 100%;
+	align-self: flex-start;
+	margin-left: 20px;
+	font-size: 12px;
+
+}
