@@ -39,15 +39,24 @@ function initApp() {
             var refreshToken = user.refreshToken;
             var providerData = user.providerData;
 
-            localStorage.setItem("uid", uid);
+            window.localStorage.setItem("uid", uid);
             localStorage.setItem("email", email);
             localStorage.setItem("displayName", displayName);
             localStorage.setItem("photoUrl", photoUrl);
             localStorage.setItem("refreshToken", refreshToken);
             localStorage.setItem("userIsAuthenticated", true);
 
+            chrome.runtime.onMessage.addListener(
+              function(request, sender, sendResponse) {
+                console.log(sender.tab ?
+                            "from a content script:" + sender.tab.url :
+                            "from the extension");
+                if (request.greeting == "hello")
+                  sendResponse({farewell: "goodbye"});
+              });
 
      
+
 
             console.log('hiiii')
 

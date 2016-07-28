@@ -1,6 +1,7 @@
 var url = window.location.href;
 console.log('url is ', url)
 
+
 chrome.runtime.sendMessage({
 	url: url,
 	title: document.title
@@ -9,6 +10,18 @@ chrome.runtime.sendMessage({
 });
 
 
+chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
+  localStorage.setItem('uid', response.farewell)
+
+});
+
+// chrome.tabs.query({active:true,currentWindow:true},function(tabs){
+//   //tabs is an array even if there is only one result
+//   var message = "stuff goes here";
+//   chrome.tabs.sendMessage(tabs[0].id,message,function(response){
+//     //in case you want a response
+//   });
+// });
 
 
 

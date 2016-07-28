@@ -30,6 +30,12 @@ publicLinksRef.once('value', function(snapshot) {
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         console.log('message incoming! where is it from?')
+        if (request.greeting == "hello"){
+        	
+        	var uid = localStorage.uid;
+          sendResponse({farewell: uid});
+        }
+
         if (request.url) {
             console.log('message coming from content script')
             var url = request.url;
@@ -44,6 +50,7 @@ chrome.runtime.onMessage.addListener(
             //check to see if that UID is a key under "users"
 
             var uid = localStorage.uid;
+            localStorage.setItem('uid', uid)
             var uidRef = usersRef.child(uid);
 
             usersRef.once('value', function(snapshot) {
@@ -60,6 +67,10 @@ chrome.runtime.onMessage.addListener(
                     var faviconUrl = favicon + url;
                     var timestamp = Date.now();
                     var negTimestamp = -timestamp;
+
+                    chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
+                      console.log(response.farewell);
+                    });
 
                     var publicLinksRef = rootRef.child('publicLinks');
 
@@ -110,4 +121,9 @@ chrome.runtime.onMessage.addListener(
 
         }
 
+
     }, false);
+
+
+
+

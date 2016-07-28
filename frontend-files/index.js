@@ -5,7 +5,17 @@ var totalLinks = 0;
 var totalClicks = 0;
 var clickedLinksRef = ref.child('clickedLinks');
 
+
+
+
 setInterval(function() {
+    if(localStorage.uid){
+        var myUid = localStorage.uid;
+        console.log('myUid is ', myUid)
+    } else {
+        console.log('no uid available')
+    }
+
     ref.child("publicLinks").limitToLast(50).once("value", function(snapshot) {
 
         //create an empty result object
@@ -31,6 +41,7 @@ setInterval(function() {
                 console.log('empty title')
             } else {
 
+
                 var timestamp = value.timestamp;
                 var niceTime = moment(timestamp).fromNow()
                 var shortenedTitle = value.title.split('').splice(0, 85).join('');
@@ -50,10 +61,12 @@ setInterval(function() {
                 var linkText = document.createTextNode(shortenedTitle);
                 var timePosted = document.createElement('div');
                 var time = document.createTextNode(niceTime)
+                var valueUid = value.uid
 
                 siteBlock.className = "site-block";
                 leftSide.className = "left-side";
                 profPic.className = "prof-pic";
+                profPic.setAttribute("data", valueUid)
                 rightSide.className = "right-side";
                 favicon.className = "favicon";
                 siteTitle.className = "site-title";
@@ -96,6 +109,8 @@ setInterval(function() {
                       }
                     })
                 }
+
+                    
             }
         }
 
@@ -124,6 +139,21 @@ setInterval(function() {
 
         })
 
+        var deleteButton = document.querySelectorAll(".delete-button");
+        for(var i = 0; i < deleteButton.length; i++){
+            deleteButton[i].addEventListener('click', deleteRecord, false);
+        }
+
+        function deleteRecord (e){
+            var key = e.target.getAttribute('key');
+            
+            var publicLinksRef = ref.child("publicLinks")
+            publicLinksRef.child(key).remove();
+
+            e.target.parentNode.className = "disappear"
+
+        }
+
 
 
     }, function(errorObject) {
@@ -134,14 +164,23 @@ setInterval(function() {
 
 window.onload = function() {
 
+if(localStorage.uid){
+    var myUid = localStorage.uid;
+    console.log('myUid is ', myUid)
+} else {
+    console.log('no uid available')
+}
+
     ref.child("publicLinks").limitToLast(50).once("value", function(snapshot) {
 
             lastLoaded = snapshot.val();
             //retrieve initial data and print it to the screen
             snapshot.forEach(function(childSnapshot) {
-
+                
 
                 var value = childSnapshot.val();
+                var key = childSnapshot.key();
+
 
                 var timestamp = value.timestamp;
                 var niceTime = moment(timestamp).fromNow()
@@ -162,10 +201,13 @@ window.onload = function() {
                 var linkText = document.createTextNode(shortenedTitle);
                 var timePosted = document.createElement('div');
                 var time = document.createTextNode(niceTime)
+                var valueUid = value.uid;
+
 
                 siteBlock.className = "site-block";
                 leftSide.className = "left-side";
                 profPic.className = "prof-pic";
+                profPic.setAttribute("data", valueUid)
                 rightSide.className = "right-side";
                 favicon.className = "favicon";
                 siteTitle.className = "site-title";
@@ -190,6 +232,19 @@ window.onload = function() {
 
                 siteBlock.appendChild(leftSide);
                 siteBlock.appendChild(rightSide);
+                
+
+
+
+                var deleteButton = document.createElement('i');
+                deleteButton.className = "delete-button fa fa-times fa-3";
+                deleteButton.setAttribute("aria-hidden", true)
+                deleteButton.setAttribute("key", key)
+                if(valueUid == myUid){
+                    siteBlock.appendChild(deleteButton);
+                } else {
+                    console.log('not my item, I shouldnt be able to delete this')
+                }
 
 
             })
@@ -221,6 +276,9 @@ window.onload = function() {
             })
 
             var list = document.querySelectorAll(".site-block");
+            // var deleteButton = list.childNodes[2];
+
+
             var length = list.length;
             for (var i = 0; i < length; i++) {
                 list[i].addEventListener('click', pushClickedLink, false);
@@ -234,13 +292,25 @@ window.onload = function() {
                     console.log('clicked a link')
                     clickedLinksRef.push(url);
                     window.location = url;
-                  } else {
-                    console.log('e.target = ', e.target)
-                  }
+                  } 
                 })
 
             }
 
+            var deleteButton = document.querySelectorAll(".delete-button");
+            for(var i = 0; i < deleteButton.length; i++){
+                deleteButton[i].addEventListener('click', deleteRecord, false);
+            }
+
+            function deleteRecord (e){
+                var key = e.target.getAttribute('key');
+                
+                var publicLinksRef = ref.child("publicLinks")
+                publicLinksRef.child(key).remove();
+
+                e.target.parentNode.className = "disappear"
+
+            }
 
 
         },

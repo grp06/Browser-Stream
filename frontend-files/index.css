@@ -9,6 +9,7 @@ body {
 	font-family: 'Libre Baskerville', serif;
 	font-size: 12px;
 
+
 }
 
 #total-links-container {
@@ -49,7 +50,28 @@ body {
 
 }
 
+.delete-button {
+	position: absolute;
+	right: 10px;
+	top: 20px;
+	color: #a94442;
+	display: none !important;
+	padding: 5px;
+	font-size: 2em !important;
+}
+
+.delete-button:hover {
+	color: #3c763d;
+
+}
+
+.disappear {
+	display: none;
+}
+
+
 .site-block {
+	position: relative;
 	display: flex;
 	margin: 5px 10px;
 	padding: 15px;
@@ -60,6 +82,10 @@ body {
 	border-right: 1px solid #ccc;
 	width: 50%;
 	margin-left: 25%;
+}
+
+.site-block:hover  .delete-button{
+	display: block !important;
 }
 
 .site-block:first-child {
