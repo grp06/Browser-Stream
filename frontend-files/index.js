@@ -4,318 +4,176 @@ var lastLoaded;
 var totalLinks = 0;
 var totalClicks = 0;
 var clickedLinksRef = ref.child('clickedLinks');
+var publicLinksRef = ref.child('publicLinks');
 
-
-
-
-setInterval(function() {
-    if(localStorage.uid){
-        var myUid = localStorage.uid;
-        console.log('myUid is ', myUid)
-    } else {
-        console.log('no uid available')
-    }
-
-    ref.child("publicLinks").limitToLast(50).once("value", function(snapshot) {
-
-        //create an empty result object
-        var result = {};
-        //current = all public links 
-        var current = snapshot.val();
-
-        for (key in current) {
-            if (lastLoaded.hasOwnProperty(key)) {
-
-            } else {
-                result[key] = current[key];
-            }
-        }
-
-        console.log('result = ', result)
-
-        for (key in result) {
-
-            var value = result[key]
-
-            if (value.title == "") {
-                console.log('empty title')
-            } else {
-
-
-                var timestamp = value.timestamp;
-                var niceTime = moment(timestamp).fromNow()
-                var shortenedTitle = value.title.split('').splice(0, 85).join('');
-                var timeAgo = moment("20111031", "YYYYMMDD").fromNow()
-                var firstElement = document.getElementsByClassName('site-block')[0];
-                var container = document.getElementById('container')
-
-                var siteBlock = document.createElement('div');
-                var leftSide = document.createElement('div');
-                var profPic = document.createElement('div');
-                var profImg = document.createElement('img')
-                var rightSide = document.createElement('div');
-                var favicon = document.createElement('div');
-                var favImg = document.createElement('img');
-                var siteTitle = document.createElement('div');
-                var siteLink = document.createElement('a');
-                var linkText = document.createTextNode(shortenedTitle);
-                var timePosted = document.createElement('div');
-                var time = document.createTextNode(niceTime)
-                var valueUid = value.uid
-
-                siteBlock.className = "site-block";
-                leftSide.className = "left-side";
-                profPic.className = "prof-pic";
-                profPic.setAttribute("data", valueUid)
-                rightSide.className = "right-side";
-                favicon.className = "favicon";
-                siteTitle.className = "site-title";
-                timePosted.className = "time-posted";
-
-                profImg.src = value.photoUrl;
-                favImg.src = value.faviconUrl;
-                siteLink.href = value.url;
-
-                container.insertBefore(siteBlock, firstElement)
-
-                profPic.appendChild(profImg);
-                leftSide.appendChild(profPic);
-                rightSide.appendChild(favicon);
-                favicon.appendChild(favImg);
-                siteLink.appendChild(linkText)
-                siteTitle.appendChild(siteLink);
-                rightSide.appendChild(siteTitle)
-                timePosted.appendChild(time);
-                rightSide.appendChild(timePosted)
-
-
-                siteBlock.appendChild(leftSide);
-                siteBlock.appendChild(rightSide);
-
-                siteBlock.addEventListener('click', pushClickedLink, false);
-
-                function pushClickedLink(e) {
-                  e.preventDefault()
-
-                    clickedLinksRef.once('value', function(snapshot) {
-                      var url = e.target.href
-                      if(e.target.href){
-                        console.log('clicked a link')
-                        clickedLinksRef.push(url);
-                        window.location = url;
-
-                      } else {
-                        console.log('e.target = ', e.target)
-                      }
-                    })
-                }
-
-                    
-            }
-        }
-
-        lastLoaded = current;
-        //counts the number of records in publicLinks and appends it to the dom
-
-        ref.child("publicLinks").once("value", function(snapshot) {
-            var snap = snapshot.val();
-
-            for (key in snap) {
-                totalLinks++;
-
-            }
-
-            console.log('total links = ', totalLinks);
-            var totalLinksSpan = document.getElementById('total-links');
-            var linksNumber = document.createTextNode(totalLinks);
-
-
-            totalLinksSpan.removeChild(totalLinksSpan.childNodes[0])
-
-            totalLinksSpan.appendChild(linksNumber)
-            // console.log(totalLinksSpan)
-            // console.log(totalLinksSpan.classList)
-            totalLinks = 0;
-
-        })
-
-        var deleteButton = document.querySelectorAll(".delete-button");
-        for(var i = 0; i < deleteButton.length; i++){
-            deleteButton[i].addEventListener('click', deleteRecord, false);
-        }
-
-        function deleteRecord (e){
-            var key = e.target.getAttribute('key');
-            
-            var publicLinksRef = ref.child("publicLinks")
-            publicLinksRef.child(key).remove();
-
-            e.target.parentNode.className = "disappear"
-
-        }
-
-
-
-    }, function(errorObject) {
-        console.log("The read failed: " + errorObject.code);
-    });
-}, 2000)
-
-
-window.onload = function() {
-
-if(localStorage.uid){
+if (localStorage.uid) {
     var myUid = localStorage.uid;
     console.log('myUid is ', myUid)
 } else {
     console.log('no uid available')
 }
 
-    ref.child("publicLinks").limitToLast(50).once("value", function(snapshot) {
-
-            lastLoaded = snapshot.val();
-            //retrieve initial data and print it to the screen
-            snapshot.forEach(function(childSnapshot) {
-                
-
-                var value = childSnapshot.val();
-                var key = childSnapshot.key();
+publicLinksRef.on('child_added', function(childSnapshot, prevChildKey) {
+    var value = childSnapshot.val();
+    var key = childSnapshot.key();
 
 
-                var timestamp = value.timestamp;
-                var niceTime = moment(timestamp).fromNow()
-                var shortenedTitle = value.title.split('').splice(0, 85).join('');
-                var timeAgo = moment("20111031", "YYYYMMDD").fromNow()
-                var firstElement = document.getElementsByClassName('site-block')[0];
-                var container = document.getElementById('container')
+    var timestamp = value.timestamp;
+    var niceTime = moment(timestamp).fromNow()
+    var shortenedTitle = value.title.split('').splice(0, 85).join('');
+    var timeAgo = moment("20111031", "YYYYMMDD").fromNow()
+    var firstElement = document.getElementsByClassName('site-block')[0];
+    var container = document.getElementById('container')
 
-                var siteBlock = document.createElement('div');
-                var leftSide = document.createElement('div');
-                var profPic = document.createElement('div');
-                var profImg = document.createElement('img')
-                var rightSide = document.createElement('div');
-                var favicon = document.createElement('div');
-                var favImg = document.createElement('img');
-                var siteTitle = document.createElement('div');
-                var siteLink = document.createElement('a');
-                var linkText = document.createTextNode(shortenedTitle);
-                var timePosted = document.createElement('div');
-                var time = document.createTextNode(niceTime)
-                var valueUid = value.uid;
-
-
-                siteBlock.className = "site-block";
-                leftSide.className = "left-side";
-                profPic.className = "prof-pic";
-                profPic.setAttribute("data", valueUid)
-                rightSide.className = "right-side";
-                favicon.className = "favicon";
-                siteTitle.className = "site-title";
-                timePosted.className = "time-posted";
-
-                profImg.src = value.photoUrl;
-                favImg.src = value.faviconUrl;
-                siteLink.href = value.url;
-
-                container.insertBefore(siteBlock, firstElement)
-
-                profPic.appendChild(profImg);
-                leftSide.appendChild(profPic);
-                rightSide.appendChild(favicon);
-                favicon.appendChild(favImg);
-                siteLink.appendChild(linkText)
-                siteTitle.appendChild(siteLink);
-                rightSide.appendChild(siteTitle)
-                timePosted.appendChild(time);
-                rightSide.appendChild(timePosted)
+    var siteBlock = document.createElement('div');
+    var leftSide = document.createElement('div');
+    var profPic = document.createElement('div');
+    var profImg = document.createElement('img')
+    var rightSide = document.createElement('div');
+    var favicon = document.createElement('div');
+    var favImg = document.createElement('img');
+    var siteTitle = document.createElement('div');
+    var siteLink = document.createElement('a');
+    var linkText = document.createTextNode(shortenedTitle);
+    var timePosted = document.createElement('div');
+    var time = document.createTextNode(niceTime)
+    var valueUid = value.uid;
 
 
-                siteBlock.appendChild(leftSide);
-                siteBlock.appendChild(rightSide);
-                
+    siteBlock.className = "site-block";
+    leftSide.className = "left-side";
+    profPic.className = "prof-pic";
+    profPic.setAttribute("data", valueUid)
+    rightSide.className = "right-side";
+    favicon.className = "favicon";
+    siteTitle.className = "site-title";
+    timePosted.className = "time-posted";
+
+    profImg.src = value.photoUrl;
+    favImg.src = value.faviconUrl;
+    siteLink.href = value.url;
 
 
 
-                var deleteButton = document.createElement('i');
-                deleteButton.className = "delete-button fa fa-times fa-3";
-                deleteButton.setAttribute("aria-hidden", true)
-                deleteButton.setAttribute("key", key)
-                if(valueUid == myUid){
-                    siteBlock.appendChild(deleteButton);
-                } else {
-                    console.log('not my item, I shouldnt be able to delete this')
-                }
+    
+
+    profPic.appendChild(profImg);
+    leftSide.appendChild(profPic);
+    rightSide.appendChild(favicon);
+    favicon.appendChild(favImg);
+    siteLink.appendChild(linkText)
+    siteTitle.appendChild(siteLink);
+    rightSide.appendChild(siteTitle)
+    timePosted.appendChild(time);
+    rightSide.appendChild(timePosted)
 
 
-            })
+    siteBlock.appendChild(leftSide);
+    siteBlock.appendChild(rightSide);
 
-            //counts the number of records in publicLinks and appends it to the dom
-            ref.child("publicLinks").once("value", function(snapshot) {
-                var snap = snapshot.val();
-                for (key in snap) {
-                    totalLinks++;
-
-                }
-                var totalLinksSpan = document.getElementById('total-links');
-                var linksNumber = document.createTextNode(totalLinks);
-                totalLinksSpan.appendChild(linksNumber)
-                totalLinks = 0;
-            })
-
-            //counts the number of records in publicLinks and appends it to the dom
-            ref.child("clickedLinks").once("value", function(snapshot) {
-                var snap = snapshot.val();
-                for (key in snap) {
-                    totalClicks++;
-
-                }
-                var totalClicksSpan = document.getElementById('total-clicks');
-                var clicksNumber = document.createTextNode(totalClicks);
-                totalClicksSpan.appendChild(clicksNumber)
-                totalClicks = 0;
-            })
-
-            var list = document.querySelectorAll(".site-block");
-            // var deleteButton = list.childNodes[2];
-
-
-            var length = list.length;
-            for (var i = 0; i < length; i++) {
-                list[i].addEventListener('click', pushClickedLink, false);
+    siteBlock.style.opacity = 0;
+    var steps = 0;
+        var timer = setInterval(function() {
+            steps++;
+            siteBlock.style.opacity = 0.1 * steps;
+            if(steps >= 10) {
+                clearInterval(timer);
+                timer = undefined;
             }
+        }, 50);
 
-            function pushClickedLink(e) {
-              e.preventDefault();
-                clickedLinksRef.once('value', function(snapshot) {
-                  var url = e.target.href
-                  if(e.target.href){
-                    console.log('clicked a link')
-                    clickedLinksRef.push(url);
-                    window.location = url;
-                  } 
-                })
+    container.insertBefore(siteBlock, firstElement)
 
+
+    var deleteButton = document.createElement('i');
+    deleteButton.className = "delete-button fa fa-times fa-3";
+    deleteButton.setAttribute("aria-hidden", true)
+    deleteButton.setAttribute("key", key)
+    if (valueUid == myUid) {
+        siteBlock.appendChild(deleteButton);
+    }
+
+});
+
+//counts the number of records in publicLinks and appends it to the dom
+ref.child("publicLinks").on("value", function(snapshot) {
+    console.log('publinks snapshot here', snapshot.val())
+    var snap = snapshot.val();
+    for (key in snap) {
+        totalLinks++;
+
+    }
+    var totalLinksSpan = document.getElementById('total-links');
+    totalLinksSpan.innerHTML = totalLinks;
+    totalLinks = 0;
+})
+
+//counts the number of records in publicLinks and appends it to the dom
+
+
+ref.child("clickedLinks").on("value", function(childSnapshot) {
+    console.log('something changed')
+    var snap = childSnapshot.val();
+    for (key in snap) {
+        totalClicks++;
+    }
+
+    var totalClicksSpan = document.getElementById('total-clicks');
+    totalClicksSpan.innerHTML = totalClicks;
+    totalClicks = 0;
+})
+
+
+window.onload = function() {
+
+
+
+
+
+
+window.setTimeout(function(){
+
+
+    var list = document.querySelectorAll(".site-block");
+    // var deleteButton = list.childNodes[2];
+
+
+    var length = list.length;
+    for (var i = 0; i < length; i++) {
+        list[i].addEventListener('click', pushClickedLink, false);
+    }
+
+    function pushClickedLink(e) {
+        e.preventDefault();
+        clickedLinksRef.once('value', function(snapshot) {
+            var url = e.target.href
+            if (e.target.href) {
+                console.log('clicked a link')
+                clickedLinksRef.push(url);
+                window.location = url;
             }
+        })
 
-            var deleteButton = document.querySelectorAll(".delete-button");
-            for(var i = 0; i < deleteButton.length; i++){
-                deleteButton[i].addEventListener('click', deleteRecord, false);
-            }
+    }
 
-            function deleteRecord (e){
-                var key = e.target.getAttribute('key');
-                
-                var publicLinksRef = ref.child("publicLinks")
-                publicLinksRef.child(key).remove();
+    var deleteButton = document.querySelectorAll(".delete-button");
+    for (var i = 0; i < deleteButton.length; i++) {
+        deleteButton[i].addEventListener('click', deleteRecord, false);
+    }
 
-                e.target.parentNode.className = "disappear"
+    function deleteRecord(e) {
+        console.log('hi')
+        var key = e.target.getAttribute('key');
 
-            }
+        var publicLinksRef = ref.child("publicLinks")
+        publicLinksRef.child(key).remove();
+
+        e.target.parentNode.className = "disappear"
+
+    }
+},1000)
 
 
-        },
-        function(errorObject) {
-            console.log("The read failed: " + errorObject.code);
-        });
+
 
 }

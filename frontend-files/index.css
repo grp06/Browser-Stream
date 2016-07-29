@@ -82,6 +82,7 @@ body {
 	border-right: 1px solid #ccc;
 	width: 50%;
 	margin-left: 25%;
+	transition: .5s;
 }
 
 .site-block:hover  .delete-button{
