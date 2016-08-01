@@ -15,7 +15,7 @@
  */
 
 html, body {
-  font-family: 'Cormorant Garamond', serif;
+  font-family: 'Libre Baskerville', serif;
 
 }
 
@@ -30,58 +30,82 @@ body {
   
   margin: 0;
   padding: 20px;
-  width: 230px;
+  width: 200px;
+
 }
-a {
-  text-decoration: none;
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 h3 {
-  font-size: 24px;
-  text-align: center;
+  font-size: 18px;
+}
+
+#sign-in {
+  color: #fff;
+  background-color: #5cb85c;
+  border: 1px solid  #5cb85c;
+  border-radius: 3px;
+  box-shadow: 1px 1px 2px #ccc;
+  padding: 5px;
+  font-size: 16px;
+  transition: .5s;
+  margin-right: 15px;
+  margin-top: 15px;
 
 }
 
-#public-status {
-  font-size: 20px;
-  text-align: center;
-  padding: 10px 0;
-  font-weight: bold;
+#sign-in:hover {
+    color: #fff;
+    background-color: #5cb85c;
+    border-color: #5cb85c;
+    transition: .5s;
+    cursor: pointer;
 }
 
-#quickstart-button {
-  background-color: white;
-  border-radius: 2px;
-  font-size: 12px;
-  border: 1px solid #ccc;
-  text-align: center;
-  width: 80%;
-  margin-left: 10%;
-  margin-top: 10px;
-}
-.green {
-  color: #3c763d;
+#sign-out {
+  color: #fff;
+  background-color: #0275d8;
+  border: 1px solid  #0275d8;
+  border-radius: 3px;
+  box-shadow: 1px 1px 2px #ccc;
+  padding: 5px;
+  font-size: 16px;
+  transition: .5s;
+  margin-top: 15px;
 
+
+}
+
+#sign-out:hover {
+    color: #fff;
+    background-color: #0275d8;
+    border-color: #0275d8;
+    transition: .5s;
+    cursor: pointer;
 }
 
 .red {
-  color: #a94442;
-}
-#quickstart-button:disabled {
-  background-color: #ccc;
+  color: red;
 }
 
-
+.green {
+  color: green;
+}
 
 #button-1 {
+  width: 100%;
+  padding: 5px 10px;
   background-color: white;
-  border-radius: 2px;
-  font-size: 16px;
+  box-shadow: 1px 1px 1px #ccc;
   border: 1px solid #ccc;
-  padding: 10px;
-  text-align: center;
-  width: 80%;
-  margin-left: 10%;
+  border-radius: 2px;
 }
 
-
+#public-status {
+  padding: 10px 0;
+}

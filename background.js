@@ -30,10 +30,12 @@ publicLinksRef.once('value', function(snapshot) {
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         console.log('message incoming! where is it from?')
-        if (request.greeting == "hello"){
-        	
-        	var uid = localStorage.uid;
-          sendResponse({farewell: uid});
+        if (request.greeting == "hello") {
+
+            var uid = localStorage.uid;
+            sendResponse({
+                farewell: uid
+            });
         }
 
         if (request.url) {
@@ -45,7 +47,7 @@ chrome.runtime.onMessage.addListener(
                 if (!snapshot.val()) {
                     clickedLinksRef.push('www.google.com');
                     console.log('clickedlinks created')
-                } 
+                }
             })
             //check to see if that UID is a key under "users"
 
@@ -68,9 +70,11 @@ chrome.runtime.onMessage.addListener(
                     var timestamp = Date.now();
                     var negTimestamp = -timestamp;
 
-                    chrome.runtime.sendMessage({greeting: "hello"}, function(response) {
-                      console.log(response.farewell);
-                    });
+                    // chrome.runtime.sendMessage({
+                    //     greeting: "hello"
+                    // }, function(response) {
+                    //     console.log(response.farewell);
+                    // });
 
                     var publicLinksRef = rootRef.child('publicLinks');
 
@@ -96,34 +100,32 @@ chrome.runtime.onMessage.addListener(
                 }
             })
 
-        //otherwise, we're getting a message from popup.js, meaning they clicked it again, or they've signed in for the first time
-        } else {
-            console.log('message coming from popup')
-
-            var uid = localStorage.uid
-            request.message.visitedLinks = 0;
-            console.log('request.message = ', request.message)
-            var userObject = {};
-            userObject = request.message
-
-            usersRef.once('value', function(snapshot) {
-                if (!snapshot.hasChild(uid)) {
-                    var uniqueIdRef = usersRef.child(uid);
-                    uniqueIdRef.set(userObject)
-                    console.log("userObject = ", userObject)
-                    console.log('popup was clicked an no UID was found so we inserted your profile and data')
-                } else {
-                    console.log('already in db')
-                }
-
-            })
-
-
+            //otherwise, we're getting a message from popup.js, meaning they clicked it again, or they've signed in for the first time
         }
+
+        // if (thing) {
+        //     console.log('message coming from popup')
+        //     console.log('message = ', message)
+        //     var uid = localStorage.uid
+        //     request.message.visitedLinks = 0;
+        //     console.log('request.message = ', request.message)
+        //     var userObject = {};
+        //     userObject = request.message
+
+        //     usersRef.once('value', function(snapshot) {
+        //         if (!snapshot.hasChild(uid)) {
+        //             var uniqueIdRef = usersRef.child(uid);
+        //             uniqueIdRef.set(userObject)
+        //             console.log("userObject = ", userObject)
+        //             console.log('popup was clicked an no UID was found so we inserted your profile and data')
+        //         } else {
+        //             console.log('already in db')
+        //         }
+
+        //     })
+
+
+        // }
 
 
     }, false);
-
-
-
-
