@@ -2,16 +2,24 @@
 	<head>
 		
 		<script src="firebase.js" ></script>
+		<script src="https://www.gstatic.com/firebasejs/live/3.1/firebase.js"></script>
 		<script src="moment.js"></script>
 		<link rel="stylesheet" type="text/css" href="index.css">
 		<link href='https://fonts.googleapis.com/css?family=Libre+Baskerville' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css">
 		<link rel="stylesheet" href="animate.css">
-
 	</head>
 	<body>
+		<div id="sign-in-section">
+			<div class="modal">
+				<div class="logo">
+					<h1>Browser Stream</h1>
+				</div>
+				<button id="sign-in">Sign-in with Google</button>
+			</div>
+		</div>
 		<div class="top-nav">
-			<div class="stats-box">
+			<div class="stats-box hidden">
 				<div id="total-links-container">
 					Total Links: <span id="total-links"></span>
 				</div>
@@ -22,6 +30,7 @@
 			<div class="browser-stream">
 				Browser Stream
 			</div>
+			<button id="sign-out">Sign Out</button>
 		</div>
 		<!-- 		<input type="text" id="text-box" /> -->
 		<div id="container">
