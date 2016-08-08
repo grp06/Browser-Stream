@@ -3,6 +3,7 @@ var usersRef = rootRef.child('users');
 var publicLinksRef = rootRef.child('publicLinks');
 var clickedLinksRef = rootRef.child('clickedLinks');
 console.log('background script');
+console.log('localStorage ', localStorage)
 
 if (!localStorage.first) {
     chrome.tabs.create({
@@ -29,103 +30,117 @@ publicLinksRef.once('value', function(snapshot) {
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
-        console.log('message incoming! where is it from?')
-        if (request.greeting == "hello") {
+        var url = request.url;
+        var title = request.title;
+        var favicon = 'https://plus.google.com/_/favicon?domain=';
+        var faviconUrl = favicon + url;
+        var timestamp = Date.now();
+        var negTimestamp = -timestamp;
 
-            var uid = localStorage.uid;
-            sendResponse({
-                farewell: uid
-            });
-        }
+        console.log('request = ', request)
 
-        if (request.url) {
-            console.log('message coming from content script')
-            var url = request.url;
-
+        if (request.newUser == "true") {
             //if clickedLinks isn't in the DB yet, instantiate it
-            clickedLinksRef.once('value', function(snapshot) {
-                if (!snapshot.val()) {
-                    clickedLinksRef.push('www.google.com');
-                    console.log('clickedlinks created')
-                }
-            })
-            //check to see if that UID is a key under "users"
+            // clickedLinksRef.once('value', function(snapshot) {
+            //     if (!snapshot.val()) {
+            //         clickedLinksRef.push('www.google.com');
+            //         console.log('clickedlinks created')
+            //     }
+            // })
 
-            var uid = localStorage.uid;
+            console.log('BG SCRIPT: We just got authenticated, need to make initial DB insert for the user and visitedLinks')
+
+            console.log('and we should push to publicLinks')
+
+            var oauthToken = request.oauthToken;
+            var uid = request.uid;
+            var photoUrl = request.photoUrl;
+            var email = request.email;
+            var displayName = request.displayName;
+            console.log('oauthToken = ', oauthToken)
+            console.log('uid = ', uid)
+            console.log('photoUrl = ', photoUrl)
+            console.log('email = ', email)
+            console.log('displayName = ', displayName)
+
+
+            localStorage.setItem('oauthToken', oauthToken)
             localStorage.setItem('uid', uid)
+            localStorage.setItem('photoUrl', photoUrl)
+            localStorage.setItem('email', email)
+            localStorage.setItem('displayName', displayName)
+            localStorage.setItem('newUser', 'false');
+
+            request.visitedLinks = 0;
+            console.log('request = ', request)
+
+            var userObject = {};
+            userObject[uid] = request;
+
+            usersRef.set(userObject);
             var uidRef = usersRef.child(uid);
 
-            usersRef.once('value', function(snapshot) {
-                //when the page reloads, content script runs
-                //if the user is already in the DB and publicBrowsing is enabled
-                //lets go make a DB insert
-                if (snapshot.hasChild(uid) && localStorage.publicBrowsing == "true") {
-                    var url = request.url;
-                    var title = request.title;
-                    var displayName = localStorage.displayName
-                    var email = localStorage.email
-                    var photoUrl = localStorage.photoUrl
-                    var favicon = 'https://plus.google.com/_/favicon?domain=';
-                    var faviconUrl = favicon + url;
-                    var timestamp = Date.now();
-                    var negTimestamp = -timestamp;
+            var visitedLinksRef = uidRef.child('visitedLinks')
 
-                    // chrome.runtime.sendMessage({
-                    //     greeting: "hello"
-                    // }, function(response) {
-                    //     console.log(response.farewell);
-                    // });
+            //check to see if that UID is a key under "users"
+            //&& localStorage.publicBrowsing == "true"
+            if (localStorage.publicBrowsing === "true") {
+                console.log('public browsing is true and this IS our first insert')
 
-                    var publicLinksRef = rootRef.child('publicLinks');
+                var publicBrowsing = true;
+                publicLinksRef.push({
+                    url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
+                });
 
-                    if (title == "") {
-                        console.log('Empty title. We don\'t insert these guys');
-                    } else {
-                        var publicBrowsing = true;
-                        publicLinksRef.push({
-                            url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
-                        });
-
-                        visitedLinksRef = uidRef.child('visitedLinks')
-
-                        visitedLinksRef.push({
-                            url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
-                        })
-                    }
+                visitedLinksRef.push({
+                    url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
+                })
+            } else {
+                console.log('public browsing is false, so youre not gonna make URL inserts')
+            }
 
 
 
-                } else {
-                    console.log('uid is not there or public browsing isnt enabled, no DB insert')
-                }
-            })
 
-            //otherwise, we're getting a message from popup.js, meaning they clicked it again, or they've signed in for the first time
+        } else {
+            console.log('BG SCRIPT: weve already been authenticated, just push to visitedLinks and publicLinks')
+
+            var oauthToken = localStorage.getItem('oauthToken')
+            var uid = localStorage.getItem('uid')
+            var photoUrl = localStorage.getItem('photoUrl')
+            var email = localStorage.getItem('email')
+            var displayName = localStorage.getItem('displayName')
+            var newUser = localStorage.getItem('newUser');
+            console.log('oauthToken = ', oauthToken)
+            console.log('uid = ', uid)
+            console.log('photoUrl = ', photoUrl)
+            console.log('email = ', email)
+            console.log('displayName = ', displayName)
+            console.log('newUser = ', newUser)
+
+            var uidRef = usersRef.child(uid);
+            var visitedLinksRef = uidRef.child('visitedLinks')
+
+            if (localStorage.publicBrowsing === "true") {
+                console.log('public browsing is true and this isnt our first insert')
+                var publicBrowsing = true;
+                publicLinksRef.push({
+                    url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
+                });
+
+                visitedLinksRef.push({
+                    url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
+                })
+            } else {
+                console.log('public browsing is false, so youre not gonna make URL inserts')
+            }
+
         }
 
-        // if (thing) {
-        //     console.log('message coming from popup')
-        //     console.log('message = ', message)
-        //     var uid = localStorage.uid
-        //     request.message.visitedLinks = 0;
-        //     console.log('request.message = ', request.message)
-        //     var userObject = {};
-        //     userObject = request.message
-
-        //     usersRef.once('value', function(snapshot) {
-        //         if (!snapshot.hasChild(uid)) {
-        //             var uniqueIdRef = usersRef.child(uid);
-        //             uniqueIdRef.set(userObject)
-        //             console.log("userObject = ", userObject)
-        //             console.log('popup was clicked an no UID was found so we inserted your profile and data')
-        //         } else {
-        //             console.log('already in db')
-        //         }
-
-        //     })
 
 
-        // }
+
+
 
 
     }, false);

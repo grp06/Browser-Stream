@@ -129,12 +129,7 @@ function change() {
 
 window.onload = function() {
 console.log('load')
-  // if(localStorage.userIsAuthenticated == "false"){
-  //   document.getElementById("sign-out").style.display = "none"
-  // } else {
-  //   document.getElementById("sign-in").style.display = "none" 
-  // }
-    
+
     
     var publicBrowsing = localStorage.publicBrowsing;
     // var elem = document.getElementById("button-1");

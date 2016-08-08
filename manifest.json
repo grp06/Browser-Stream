@@ -19,7 +19,8 @@
       {
       "matches": ["<all_urls>"],
       "js": ["firebase.js", "content-script.js"],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "exclude_globs": ["https://search-feed-35574.firebaseapp.com/*"]
       }
   ],
   "permissions": [

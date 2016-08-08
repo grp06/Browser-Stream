@@ -10,6 +10,7 @@ firebase.initializeApp(config);
 var provider = new firebase.auth.GoogleAuthProvider();
 
 if (localStorage.oauthToken == 'null') {
+    console.log('no oauthToken, gonna sign in then set some localStorage')
     var topNav = document.querySelectorAll('.top-nav');
     topNav[0].classList.add('hidden')
     var container = document.getElementById('container');
@@ -18,8 +19,20 @@ if (localStorage.oauthToken == 'null') {
     function signIn() {
         firebase.auth().signInWithPopup(provider).then(function(result) {
             var token = result.credential.idToken;
-            localStorage.setItem('oauthToken', token)
             var user = result.user;
+            var uid = user.uid;
+            var photoUrl = user.providerData[0].photoURL;
+            var email = user.providerData[0].email;
+            var displayName = user.providerData[0].displayName;
+
+            localStorage.setItem('oauthToken', token);
+            localStorage.setItem('uid', uid);
+            localStorage.setItem('photoUrl', photoUrl);
+            localStorage.setItem('email', email);
+            localStorage.setItem('displayName', displayName);
+            localStorage.setItem('newUser', "true");
+            console.log('signed in and local storage set, gonna force a reload')
+
             window.location.reload(true)
         }).catch(function(error) {
             var errorCode = error.code;
@@ -35,15 +48,6 @@ if (localStorage.oauthToken == 'null') {
     }
 
 } else {
-    var signInSection = document.getElementById('sign-in-section');
-    signInSection.classList.add('hidden')
-    var onloadTimestamp;
-    var ref = new Firebase("https://search-feed-35574.firebaseio.com/");
-    var lastLoaded;
-    var totalLinks = 0;
-    var totalClicks = 0;
-    var clickedLinksRef = ref.child('clickedLinks');
-    var publicLinksRef = ref.child('publicLinks');
 
     if (localStorage.uid) {
         var myUid = localStorage.uid;
@@ -52,9 +56,20 @@ if (localStorage.oauthToken == 'null') {
         console.log('no uid available')
     }
 
+    var signInSection = document.getElementById('sign-in-section');
+    signInSection.classList.add('hidden')
+    var ref = new Firebase("https://search-feed-35574.firebaseio.com/");
+    var totalLinks = 0;
+    var totalClicks = 0;
+    var clickedLinksRef = ref.child('clickedLinks');
+    var publicLinksRef = ref.child('publicLinks');
+
+
+
     publicLinksRef.limitToLast(100).on('child_added', function(childSnapshot, prevChildKey) {
         console.log('child added!')
         var value = childSnapshot.val();
+        console.log('value = ', value)
         var key = childSnapshot.key();
 
         var timestamp = value.timestamp;
@@ -62,7 +77,7 @@ if (localStorage.oauthToken == 'null') {
         var shortenedTitle = value.title.split('').splice(0, 85).join('');
         var timeAgo = moment("20111031", "YYYYMMDD").fromNow()
         var firstElement = document.getElementsByClassName('site-block')[0];
-        
+
         var container = document.getElementById('container')
         var siteBlock = document.createElement('div');
         var leftSide = document.createElement('div');
@@ -154,6 +169,7 @@ if (localStorage.oauthToken == 'null') {
         function signOut() {
             firebase.auth().signOut().then(function() {
                 localStorage.setItem('oauthToken', null);
+                localStorage.setItem('newUser', "true");
                 console.log('localStorage.oauthToken = ', localStorage.oauthToken)
                 console.log('signOut sucessful')
                 window.location.reload(true)
@@ -206,7 +222,7 @@ if (localStorage.oauthToken == 'null') {
                 profPic[i].addEventListener('click', showProfile, false);
             }
 
-            function showProfile (e){
+            function showProfile(e) {
                 var key = this.getAttribute('data')
                 console.log(key)
                 var userRef = ref.child("users");
@@ -217,9 +233,6 @@ if (localStorage.oauthToken == 'null') {
                 })
 
             }
-
-
-
 
         }, 6000)
     }
