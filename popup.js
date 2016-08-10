@@ -129,7 +129,16 @@ function change() {
 
 window.onload = function() {
 console.log('load')
+<<<<<<< HEAD
 
+=======
+  // if(localStorage.userIsAuthenticated == "false"){
+  //   document.getElementById("sign-out").style.display = "none"
+  // } else {
+  //   document.getElementById("sign-in").style.display = "none" 
+  // }
+    
+>>>>>>> c79db5cf372282360a607d96b915f81a25482c9e
     
     var publicBrowsing = localStorage.publicBrowsing;
     // var elem = document.getElementById("button-1");
