@@ -1,0 +1,1 @@
+# A Chrome Extension that allows you to share your browsing history with your friends
