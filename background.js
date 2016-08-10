@@ -72,6 +72,7 @@ chrome.runtime.onMessage.addListener(
             localStorage.setItem('newUser', 'false');
 
             request.visitedLinks = 0;
+            request.followers = 0;
             console.log('request = ', request)
 
             var userObject = {};
