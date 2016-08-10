@@ -5,10 +5,7 @@
 html {
   overflow-y: scroll;
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> c79db5cf372282360a607d96b915f81a25482c9e
 
 body {
 	background-color: #f7f7f7;
@@ -228,7 +225,6 @@ body {
 }
 .hidden {
 	display: none !important;
-<<<<<<< HEAD
 }
 
 .close-profile-div {
@@ -397,6 +393,3 @@ body {
 
 
 
-=======
-}
->>>>>>> c79db5cf372282360a607d96b915f81a25482c9e
