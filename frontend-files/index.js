@@ -10,7 +10,7 @@ firebase.initializeApp(config);
 var provider = new firebase.auth.GoogleAuthProvider();
 
 if (localStorage.oauthToken == 'null') {
-    console.log('no oauthToken, gonna sign in then set some localStorage')
+    console.log('no oauthToken, youre gonna see the signin button')
     var topNav = document.querySelectorAll('.top-nav');
     topNav[0].classList.add('hidden')
     var container = document.getElementById('container');
@@ -24,6 +24,10 @@ if (localStorage.oauthToken == 'null') {
             var photoUrl = user.providerData[0].photoURL;
             var email = user.providerData[0].email;
             var displayName = user.providerData[0].displayName;
+
+            if (displayName == null) {
+                displayName = ''
+            }
 
             localStorage.setItem('oauthToken', token);
             localStorage.setItem('uid', uid);
@@ -51,14 +55,6 @@ if (localStorage.oauthToken == 'null') {
     } else {
         console.log('no uid available')
     }
-
-
-
-
-
-
-
-
 
     var appendSiteBlocks = function(snapshot) {
         var publicLinksKey = snapshot.key();
@@ -168,153 +164,171 @@ if (localStorage.oauthToken == 'null') {
                 siteBlocks[i].style.visibility = 'hidden';
             }
 
-            usersRef.child(key).once('value', function(snap){
-              console.log(snap.val());
+            usersRef.child(key).once('value', function(snap) {
+                console.log('snap.val() = ', snap.val());
 
-              var childSnapshotVal = snap.val();
-              var profLink = childSnapshotVal.photoUrl;
-              var displayName = childSnapshotVal.displayName;
+                var childSnapshotVal = snap.val();
+                var profLink = childSnapshotVal.photoUrl;
+                var displayName = childSnapshotVal.displayName;
 
-              var container = document.getElementById('container');
+                var container = document.getElementById('container');
 
-              var profilePage = document.createElement('div');
+                var profilePage = document.createElement('div');
 
-              var profileContainer = document.createElement('div');
-              var ppLeftSide = document.createElement('div');
-              var ppProfPic = document.createElement('div');
-              var ppProfImg = document.createElement('img');
-              ppProfImg.src = profLink;
-              var displayNameDiv = document.createElement('div');
-              var displayNameText = document.createTextNode(displayName);
-              displayNameDiv.appendChild(displayNameText);
+                var profileContainer = document.createElement('div');
+                var ppLeftSide = document.createElement('div');
+                var ppProfPic = document.createElement('div');
+                var ppProfImg = document.createElement('img');
+                ppProfImg.src = profLink;
+                var displayNameDiv = document.createElement('div');
+                var displayNameText = document.createTextNode(displayName);
+                displayNameDiv.appendChild(displayNameText);
 
-              var ppRightSide = document.createElement('div');
-              var userStats = document.createElement('div');
+                var ppRightSide = document.createElement('div');
+                var userStats = document.createElement('div');
 
-              var links = document.createElement('div');
-              var linksNumber = document.createElement('div');
-              var linksNumberText = document.createTextNode(0);
-              linksNumber.appendChild(linksNumberText);
-              var linksTextDiv = document.createElement('div');
-              var linksText = document.createTextNode('Links');
-              linksTextDiv.appendChild(linksText);
-
-
-              var followers = document.createElement('div');
-              var followersNumber = document.createElement('div');
-              var followersNumberText = document.createTextNode('0');
-              followersNumber.appendChild(followersNumberText);
-              var followersTextDiv = document.createElement('div');
-              var followersText = document.createTextNode('Followers');
-              followersTextDiv.appendChild(followersText);
-
-              var following = document.createElement('div');
-              var followingNumber = document.createElement('div');
-              var followingNumberText = document.createTextNode('0');
-              followingNumber.appendChild(followingNumberText);
-              var followingTextDiv = document.createElement('div');
-              var followingText = document.createTextNode('Following');
-              followingTextDiv.appendChild(followingText);
-
-              var followingButtonDiv = document.createElement('div');
-              var followingButton = document.createElement('button');
-              followingButton.setAttribute("data", snapshotValUid)
-
-              var followingButtonText = document.createTextNode('Follow');
-              followingButton.appendChild(followingButtonText);
-
-              profilePage.className = "profile-page animated fadeIn";
-
-              profileContainer.className = "profile-container";
-              ppLeftSide.className = "pp-left-side";
-              ppProfPic.className = "pp-prof-pic";
-              displayNameDiv.className = "display-name-div";
-              ppRightSide.className = "pp-right-side";
-              userStats.className = "user-stats";
-              links.className = "links";
-              linksNumber.className = "links-number";
-              linksTextDiv.className = "links-text-div";
-              followers.className = "followers";
-              followersNumber.className = "followers-number";
-              followersTextDiv.className = "followers-text-div";
-              following.className = "following";
-              followingNumber.className = "following-number";
-              followingTextDiv.className = "following-text-div";
-              followingButtonDiv.className = "following-button-div";
-              followingButton.className = "following-button";
-              followingButtonDiv.addEventListener('click', toggleFollow, false);
+                var links = document.createElement('div');
+                var linksNumber = document.createElement('div');
+                var linksNumberText = document.createTextNode(0);
+                linksNumber.appendChild(linksNumberText);
+                var linksTextDiv = document.createElement('div');
+                var linksText = document.createTextNode('Links');
+                linksTextDiv.appendChild(linksText);
 
 
-              container.appendChild(profilePage);
+                var followers = document.createElement('div');
+                var followersNumber = document.createElement('div');
+                var calculatedFollowers = 0
+                usersRef.child(key).child('followers').once('value', function(babysnap) {
 
+                    var babysnapVal = babysnap.val();
+                    for (snap in babysnapVal) {
+                        console.log('a follower is here')
 
-              profilePage.appendChild(profileContainer);
-              profileContainer.appendChild(ppLeftSide);
-              var closeProfileDiv = document.createElement('div');
-              var closeProfileIcon = document.createElement('i');
-              var closeText = document.createTextNode('Close');
-              closeProfileIcon.className = "close-profile-button fa fa-times fa-3";
-              closeProfileDiv.className = "close-profile-div";
-              closeProfileDiv.appendChild(closeText);
-              closeProfileDiv.appendChild(closeProfileIcon);
-
-              profileContainer.appendChild(closeProfileDiv);
-              ppLeftSide.appendChild(displayNameDiv);
-
-              ppLeftSide.appendChild(ppProfPic);
-              ppProfPic.appendChild(ppProfImg);
-              ppLeftSide.appendChild(followingButtonDiv);
-
-              profileContainer.appendChild(ppRightSide);
-              ppRightSide.appendChild(userStats);
-              userStats.appendChild(links);
-              links.appendChild(linksNumber);
-              links.appendChild(linksTextDiv);
-              userStats.appendChild(followers);
-              followers.appendChild(followersNumber);
-              followers.appendChild(followersTextDiv);
-              userStats.appendChild(following);
-              following.appendChild(followingNumber);
-              following.appendChild(followingTextDiv);
-              followingButtonDiv.appendChild(followingButton);
-
-              var linkDisplay = document.getElementsByClassName('links-number')[0];
-              console.log('linkDisplay =', linkDisplay)
-              var linkCount = 0;
-
-              publicLinksRef.on('value', function(snapshot) {
-
-
-                snapshot.forEach(function(childSnapshot){
-                  var childSnapshotVal = childSnapshot.val();
-                  if (childSnapshotVal.uid === key) {
-                      window.setTimeout(function(){
-                        linkCount++;
-
-                        linkDisplay.innerHTML = linkCount;
-
-                      },300)
-
+                        calculatedFollowers++
                     }
+                    followersNumber.innerHTML = calculatedFollowers
+
                 })
 
+                var followersTextDiv = document.createElement('div');
+                var followersText = document.createTextNode('Followers');
+                followersTextDiv.appendChild(followersText);
+
+                var following = document.createElement('div');
+                var followingNumber = document.createElement('div');
+                var calculatedFollowing = 0;
+                usersRef.child(myUid).child('following').once('value', function(babysnap) {
+
+                    var babysnapVal = babysnap.val();
+                    for (snap in babysnapVal) {
+                        console.log(' followingis here')
+
+                        calculatedFollowing++
+                    }
+                    followingNumber.innerHTML = calculatedFollowing
+
+                })
+                var followingTextDiv = document.createElement('div');
+                var followingText = document.createTextNode('Following');
+                followingTextDiv.appendChild(followingText);
+
+                var followingButtonDiv = document.createElement('div');
+                var followingButton = document.createElement('button');
+                followingButton.setAttribute("data", snapshotValUid)
+
+                var followingButtonText = document.createTextNode('Follow');
+                followingButton.appendChild(followingButtonText);
+
+                profilePage.className = "profile-page";
+
+                profileContainer.className = "profile-container";
+                ppLeftSide.className = "pp-left-side";
+                ppProfPic.className = "pp-prof-pic";
+                displayNameDiv.className = "display-name-div";
+                ppRightSide.className = "pp-right-side";
+                userStats.className = "user-stats";
+                links.className = "links";
+                linksNumber.className = "links-number";
+                linksTextDiv.className = "links-text-div";
+                followers.className = "followers";
+                followersNumber.className = "followers-number";
+                followersTextDiv.className = "followers-text-div";
+                following.className = "following";
+                followingNumber.className = "following-number";
+                followingTextDiv.className = "following-text-div";
+                followingButtonDiv.className = "following-button-div";
+                followingButton.className = "following-button";
+                followingButtonDiv.addEventListener('click', toggleFollow, false);
+
+
+                container.appendChild(profilePage);
+
+
+                profilePage.appendChild(profileContainer);
+                profileContainer.appendChild(ppLeftSide);
+                var closeProfileDiv = document.createElement('div');
+                var closeProfileIcon = document.createElement('i');
+                var closeText = document.createTextNode('Close');
+                closeProfileIcon.className = "close-profile-button fa fa-times fa-3";
+                closeProfileDiv.className = "close-profile-div";
+                closeProfileDiv.appendChild(closeText);
+                closeProfileDiv.appendChild(closeProfileIcon);
+
+                profileContainer.appendChild(closeProfileDiv);
+                ppLeftSide.appendChild(displayNameDiv);
+
+                ppLeftSide.appendChild(ppProfPic);
+                ppProfPic.appendChild(ppProfImg);
+                ppLeftSide.appendChild(followingButtonDiv);
+
+                profileContainer.appendChild(ppRightSide);
+                ppRightSide.appendChild(userStats);
+                userStats.appendChild(links);
+                links.appendChild(linksNumber);
+                links.appendChild(linksTextDiv);
+                userStats.appendChild(followers);
+                followers.appendChild(followersNumber);
+                followers.appendChild(followersTextDiv);
+                userStats.appendChild(following);
+                following.appendChild(followingNumber);
+                following.appendChild(followingTextDiv);
+                followingButtonDiv.appendChild(followingButton);
+
+                var linkDisplay = document.getElementsByClassName('links-number')[0];
+                console.log('linkDisplay =', linkDisplay)
+                var linkCount = 0;
+
+                publicLinksRef.on('value', function(snapshot) {
+
+
+                    snapshot.forEach(function(childSnapshot) {
+                        var childSnapshotVal = childSnapshot.val();
+                        if (childSnapshotVal.uid === key) {
+                            window.setTimeout(function() {
+                                linkCount++;
+
+                                linkDisplay.innerHTML = linkCount;
+
+                            }, 300)
+
+                        }
+                    })
+
 
                 })
 
-              closeProfileDiv.addEventListener('click', closeProfile, false)
+                closeProfileDiv.addEventListener('click', closeProfile, false)
 
-              function closeProfile() {
-                  var profileLinksContainer = document.getElementsByClassName('profile-links-container')[0];
-                  var siteBlocks = document.getElementsByClassName('site-block');
-                  container.removeChild(profilePage);
-                  container.removeChild(profileLinksContainer);
-                  for (var i = 0; i < siteBlocks.length; i++) {
-                      siteBlocks[i].style.visibility = "visible"
-                  }
-              }
-
-
-
+                function closeProfile() {
+                    var profileLinksContainer = document.getElementsByClassName('profile-links-container')[0];
+                    var siteBlocks = document.getElementsByClassName('site-block');
+                    container.removeChild(profilePage);
+                    container.removeChild(profileLinksContainer);
+                    for (var i = 0; i < siteBlocks.length; i++) {
+                        siteBlocks[i].style.visibility = "visible"
+                    }
+                }
 
             })
 
@@ -325,39 +339,15 @@ if (localStorage.oauthToken == 'null') {
 
 
             publicLinksRef.orderByChild('negTimestamp').on('value', function(snapshot) {
-
-                console.log('snapshot = ', snapshot.val())
-
-
-
-
-
-
-
-
-
                 snapshot.forEach(function(childSnapshot) {
-
-
-                  var childSnapshotVal = childSnapshot.val()
-
-
-                   
-
-
-
-
-
-
-
-
+                    var childSnapshotVal = childSnapshot.val()
                     if (childSnapshotVal.uid === key) {
                         // linkDisplay.innerHTML = linkCount;
-
-
                         var displayName = childSnapshotVal.displayName;
                         var faviconUrl = childSnapshotVal.faviconUrl;
                         var title = childSnapshotVal.title;
+                        var title = title.split('').splice(0, 85).join('');
+
                         var url = childSnapshotVal.url;
                         var timestamp = childSnapshotVal.timestamp;
                         var niceTime = moment(timestamp).fromNow();
@@ -383,9 +373,6 @@ if (localStorage.oauthToken == 'null') {
 
                         profileLinksContainer.appendChild(ppLinkBox)
 
-
-
-
                     }
 
                 })
@@ -393,12 +380,6 @@ if (localStorage.oauthToken == 'null') {
 
 
         }
-
-
-
-
-        console.log('nodes appended')
-
 
     }
 
@@ -411,10 +392,6 @@ if (localStorage.oauthToken == 'null') {
     var clickedLinksRef = ref.child('clickedLinks');
     var publicLinksRef = ref.child('publicLinks');
     var usersRef = ref.child("users");
-
-
-
-
 
 
     publicLinksRef.on('child_added', function(snapshot) {
@@ -454,13 +431,71 @@ if (localStorage.oauthToken == 'null') {
     })
 
     function toggleFollow(e) {
-        var data = e.target.getAttribute('data');
-        console.log(data)
+        //them
+        var userToFollow = e.target.getAttribute('data');
+        //go into users/them/followers and push myUid
+        var addToFollowersRef = ref.child('users').child(userToFollow).child('followers')
+            //go into users/myUid/following and push userToFollow
+        var addToFollowingRef = ref.child('users').child(myUid).child('following');
+
+        addToFollowersRef.once('value', function(snapshot) {
+            var followingThem = false
 
 
+            if (userToFollow == myUid) {
+                console.log('you cant be added to your own followers list!');
+                followingThem = true;
+            } else if (snapshot.val() === 0) {
+                addToFollowersRef.child(myUid).set("true");
+                followingThem = true;
+                console.log('followers array was empty before, now youre the first follower')
+            } else {
+                //loop through the UIDs of their followers and make sure youre not following them already
+                snapshot.forEach(function(childSnapshot) {
+                    if (childSnapshot.val() == myUid) {
+                        console.log('already following')
+                        followingThem = true;
+                        return
+                    } else {
+                        followingThem = false;
+                    }
+                })
+            }
+            if (!followingThem) {
+                console.log('weve checked all UIDs in their "followers" array and my UID isnt there, lets push my UID')
+                console.log('test1111')
 
-        ref.child('users').child(data).once('value', function(snapshot) {
-            console.log(snapshot.val())
+                addToFollowersRef.child(myUid).set("true");
+            }
+        })
+
+        addToFollowingRef.once('value', function(snap) {
+            var addedToMyFollowing = false
+
+            if (userToFollow == myUid) {
+                console.log('you cant be added to your own following list!');
+                addedToMyFollowing = true;
+            } else if (snap.val() === 0) {
+                addToFollowingRef.child(userToFollow).set("true");
+                addedToMyFollowing = true;
+                console.log('following array was empty before, now hes the first on my following')
+            } else {
+                //loop through all the UIDs of people I'm following and make sure I'm not already following them
+                snap.forEach(function(childSnapshot) {
+                    if (childSnapshot.val() == userToFollow) {
+                        console.log('already following')
+                        addedToMyFollowing = true;
+                        return
+                    } else {
+                        addedToMyFollowing = false;
+                    }
+                })
+            }
+            if (!addedToMyFollowing) {
+                console.log('weve checked all UIDs in my "following" array and their uid isnt there, lets push their uid');
+                console.log('test222')
+                addToFollowingRef.child(userToFollow).set("true");
+            }
         })
     }
 
@@ -470,9 +505,19 @@ if (localStorage.oauthToken == 'null') {
 
         function signOut() {
             firebase.auth().signOut().then(function() {
+                localStorage.setItem('displayName', "");
+                localStorage.setItem('email', "");
+                localStorage.setItem('uid', "");
+                localStorage.setItem('photoUrl', "");
+                localStorage.setItem('newUser', "");
                 localStorage.setItem('oauthToken', null);
-                localStorage.setItem('newUser', "true");
+                console.log('localStorage.displayName = ', localStorage.displayName)
+                console.log('localStorage.email = ', localStorage.email)
+                console.log('localStorage.uid = ', localStorage.uid)
+                console.log('localStorage.photoUrl = ', localStorage.photoUrl)
+                console.log('localStorage.newUser = ', localStorage.newUser)
                 console.log('localStorage.oauthToken = ', localStorage.oauthToken)
+
                 console.log('signOut sucessful')
                 window.location.reload(true)
             }, function(error) {

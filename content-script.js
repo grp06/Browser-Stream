@@ -1,16 +1,24 @@
 var url = window.location.href;
 var title = document.title;
-console.log('content script firing');
+console.log('CONTENT SCRIPT');
+console.log('URL is ', url)
 
-var oauthToken = localStorage.getItem('oauthToken')
-var uid = localStorage.getItem('uid')
-var photoUrl = localStorage.getItem('photoUrl')
-var email = localStorage.getItem('email')
-var displayName = localStorage.getItem('displayName')
-var newUser = localStorage.getItem('newUser');
-console.log('newUser = ', newUser)
+var displayName = localStorage.displayName;
+var email = localStorage.email;
+var newUser = localStorage.newUser;
+var oauthToken = localStorage.oauthToken;
+var photoUrl = localStorage.photoUrl;
+var uid = localStorage.uid;
 
-if (newUser == "true") {
+console.log('localStorage.displayName = ', displayName)
+console.log('localStorage.email = ', email)
+console.log('localStorage.newUser = ', newUser)
+console.log('localStorage.oauthToken = ', oauthToken)
+console.log('localStorage.photoUrl = ', photoUrl)
+
+console.log('localStorage.uid = ', localStorage.uid)
+
+if (newUser == "true" && oauthToken != "null") {
 	console.log('page completed loading, we just got authenticated')
     chrome.runtime.sendMessage({
         url: url,
@@ -26,8 +34,20 @@ if (newUser == "true") {
     });
 
     localStorage.setItem('newUser', 'false');
-} else if ( title == "") {
-	console.log('not a new user, but theres no title')
+} else if(email == ""){
+	console.log('we must have pressed LOGOUT')
+
+	chrome.runtime.sendMessage({
+	    loggedOut: "true"
+	}, function(response) {
+	    // console.log(response.farewell);
+	});
+
+
+} else if (oauthToken == "null") {
+	console.log('oauthToken === null')
+	console.log('oauthToken = ', oauthToken)
+	localStorage.setItem("newUser", "")
 
 } else {
 	console.log('we have a valid title and we arent a new user')
@@ -38,6 +58,8 @@ if (newUser == "true") {
 	}, function(response) {
 	    // console.log(response.farewell);
 	});
+	console.log('TRY THIS AGAIN we have a valid title and we arent a new user')
+
 
 }
 

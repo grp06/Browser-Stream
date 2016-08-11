@@ -2,8 +2,14 @@ var rootRef = new Firebase("https://search-feed-35574.firebaseio.com/");
 var usersRef = rootRef.child('users');
 var publicLinksRef = rootRef.child('publicLinks');
 var clickedLinksRef = rootRef.child('clickedLinks');
-console.log('background script');
-console.log('localStorage ', localStorage)
+console.log('BEGIN BACKGROUND.JS LOCALSTORAGE')
+console.log('localStorage.displayName = ', localStorage.displayName)
+console.log('localStorage.email = ', localStorage.email)
+console.log('localStorage.uid = ', localStorage.uid)
+console.log('localStorage.photoUrl = ', localStorage.photoUrl)
+console.log('localStorage.newUser = ', localStorage.newUser)
+console.log('localStorage.oauthToken = ', localStorage.oauthToken)
+console.log('END BACKGROUND.JS LOCALSTORAGE')
 
 if (!localStorage.first) {
     chrome.tabs.create({
@@ -36,10 +42,18 @@ chrome.runtime.onMessage.addListener(
         var faviconUrl = favicon + url;
         var timestamp = Date.now();
         var negTimestamp = -timestamp;
-
+        console.log('incoming chrome message')
         console.log('request = ', request)
 
-        if (request.newUser == "true") {
+
+        if(request.loggedOut == "true"){
+          localStorage.setItem('displayName', "");
+          localStorage.setItem('email', "");
+          localStorage.setItem('uid', "");
+          localStorage.setItem('photoUrl', "");
+          localStorage.setItem('newUser', "");
+          localStorage.setItem('oauthToken', null);
+        } else if (request.newUser == "true") {
             //if clickedLinks isn't in the DB yet, instantiate it
             // clickedLinksRef.once('value', function(snapshot) {
             //     if (!snapshot.val()) {
@@ -48,7 +62,7 @@ chrome.runtime.onMessage.addListener(
             //     }
             // })
 
-            console.log('BG SCRIPT: We just got authenticated, need to make initial DB insert for the user and visitedLinks')
+            console.log('BG SCRIPT: We just got authenticated, need to make initial DB insert for the user')
 
             console.log('and we should push to publicLinks')
 
@@ -57,35 +71,37 @@ chrome.runtime.onMessage.addListener(
             var photoUrl = request.photoUrl;
             var email = request.email;
             var displayName = request.displayName;
+            console.log('displayName = ', displayName)
+
             console.log('oauthToken = ', oauthToken)
             console.log('uid = ', uid)
             console.log('photoUrl = ', photoUrl)
             console.log('email = ', email)
-            console.log('displayName = ', displayName)
 
-
-            localStorage.setItem('oauthToken', oauthToken)
-            localStorage.setItem('uid', uid)
-            localStorage.setItem('photoUrl', photoUrl)
-            localStorage.setItem('email', email)
             localStorage.setItem('displayName', displayName)
+            localStorage.setItem('email', email)
             localStorage.setItem('newUser', 'false');
+            localStorage.setItem('oauthToken', oauthToken)
+            localStorage.setItem('photoUrl', photoUrl)
+            localStorage.setItem('uid', uid)
 
-            request.visitedLinks = 0;
             request.followers = 0;
+            request.following = 0;
             console.log('request = ', request)
 
-            var userObject = {};
-            userObject[uid] = request;
+            // var userObject = {};
+            // userObject = request;
 
-            usersRef.set(userObject);
-            var uidRef = usersRef.child(uid);
+            usersRef.child(uid).set(request)
 
-            var visitedLinksRef = uidRef.child('visitedLinks')
+            // var uidRef = usersRef.child(uid);
+            // uidRef.set(userObject);
+
+
 
             //check to see if that UID is a key under "users"
             //&& localStorage.publicBrowsing == "true"
-            if (localStorage.publicBrowsing === "true") {
+            if (localStorage.publicBrowsing === "true" && request.title != "") {
                 console.log('public browsing is true and this IS our first insert')
 
                 var publicBrowsing = true;
@@ -93,25 +109,25 @@ chrome.runtime.onMessage.addListener(
                     url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
                 });
 
-                visitedLinksRef.push({
-                    url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
-                })
+          
             } else {
-                console.log('public browsing is false, so youre not gonna make URL inserts')
+                console.log('public browsing is false OR the title is empty')
             }
 
 
 
 
-        } else {
-            console.log('BG SCRIPT: weve already been authenticated, just push to visitedLinks and publicLinks')
+        } else if (localStorage.newUser == ""){
+          console.log('newUser is blank, we havent signed in yet');
+        }  else {
+            console.log('BG SCRIPT: weve already been authenticated, just push to publicLinks')
 
-            var oauthToken = localStorage.getItem('oauthToken')
-            var uid = localStorage.getItem('uid')
-            var photoUrl = localStorage.getItem('photoUrl')
-            var email = localStorage.getItem('email')
-            var displayName = localStorage.getItem('displayName')
-            var newUser = localStorage.getItem('newUser');
+            var oauthToken = localStorage.oauthToken
+            var uid = localStorage.uid
+            var photoUrl = localStorage.photoUrl
+            var email = localStorage.email
+            var displayName = localStorage.displayName
+            var newUser = localStorage.newUser;
             console.log('oauthToken = ', oauthToken)
             console.log('uid = ', uid)
             console.log('photoUrl = ', photoUrl)
@@ -120,20 +136,17 @@ chrome.runtime.onMessage.addListener(
             console.log('newUser = ', newUser)
 
             var uidRef = usersRef.child(uid);
-            var visitedLinksRef = uidRef.child('visitedLinks')
 
-            if (localStorage.publicBrowsing === "true") {
+            if (localStorage.publicBrowsing === "true" && request.title != "") {
                 console.log('public browsing is true and this isnt our first insert')
                 var publicBrowsing = true;
                 publicLinksRef.push({
                     url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
                 });
 
-                visitedLinksRef.push({
-                    url, uid, title, displayName, email, photoUrl, faviconUrl, timestamp, negTimestamp, publicBrowsing
-                })
+        
             } else {
-                console.log('public browsing is false, so youre not gonna make URL inserts')
+                console.log('public browsing is false OR title is empty')
             }
 
         }
@@ -145,3 +158,4 @@ chrome.runtime.onMessage.addListener(
 
 
     }, false);
+
