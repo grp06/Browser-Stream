@@ -14,7 +14,7 @@ var clickedLinksRef = rootRef.child('clickedLinks');
 
 if (!localStorage.first) {
     chrome.tabs.create({
-        url: "http://pickettg.me/browser-stream"
+        url: "http://browserstream.io"
     });
     localStorage.first = "true";
 }
