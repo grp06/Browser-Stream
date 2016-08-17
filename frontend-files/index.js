@@ -45,6 +45,7 @@ if (localStorage.oauthToken == 'null') {
             localStorage.setItem('oauthToken', token);
             localStorage.setItem('uid', uid);
             localStorage.setItem('photoUrl', photoUrl);
+            localStorage.setItem('loggedOut', 'false');
             localStorage.setItem('email', email);
             localStorage.setItem('displayName', displayName);
             console.log('signed in and local storage set, gonna force a reload')
@@ -63,7 +64,7 @@ if (localStorage.oauthToken == 'null') {
 
     if (localStorage.uid) {
         var myUid = localStorage.uid;
-        console.log('myUid is ', myUid)
+        // console.log('myUid is ', myUid)
     } else {
         console.log('no uid available')
     }

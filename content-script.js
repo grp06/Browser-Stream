@@ -12,10 +12,9 @@ var uid = localStorage.uid;
 
 // console.log('localStorage.displayName = ', displayName)
 // console.log('localStorage.email = ', email)
-console.log('localStorage.newUser = ', newUser)
+// console.log('localStorage.newUser = ', newUser)
 // console.log('localStorage.oauthToken = ', oauthToken)
 // console.log('localStorage.photoUrl = ', photoUrl)
-
 // console.log('localStorage.uid = ', localStorage.uid)
 if (email == "") {
     console.log('we must have pressed LOGOUT')
@@ -53,7 +52,12 @@ if (email == "") {
     chrome.runtime.sendMessage({
         url: url,
         title: title,
-        newUser: "false"
+        oauthToken: oauthToken,
+        uid: uid,
+        photoUrl: photoUrl,
+        email: email,
+        displayName: displayName,
+        newUser: 'false'
     }, function(response) {
         // console.log(response.farewell);
     });
