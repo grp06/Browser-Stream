@@ -1,7 +1,7 @@
 var url = window.location.href;
 var title = document.title;
-console.log('CONTENT SCRIPT');
-console.log('URL is ', url)
+// console.log('CONTENT SCRIPT');
+// console.log('URL is ', url)
 
 var displayName = localStorage.displayName;
 var email = localStorage.email;
@@ -10,16 +10,25 @@ var oauthToken = localStorage.oauthToken;
 var photoUrl = localStorage.photoUrl;
 var uid = localStorage.uid;
 
-console.log('localStorage.displayName = ', displayName)
-console.log('localStorage.email = ', email)
+// console.log('localStorage.displayName = ', displayName)
+// console.log('localStorage.email = ', email)
 console.log('localStorage.newUser = ', newUser)
-console.log('localStorage.oauthToken = ', oauthToken)
-console.log('localStorage.photoUrl = ', photoUrl)
+// console.log('localStorage.oauthToken = ', oauthToken)
+// console.log('localStorage.photoUrl = ', photoUrl)
 
-console.log('localStorage.uid = ', localStorage.uid)
+// console.log('localStorage.uid = ', localStorage.uid)
+if (email == "") {
+    console.log('we must have pressed LOGOUT')
 
-if (newUser == "true" && oauthToken != "null") {
-	console.log('page completed loading, we just got authenticated')
+    chrome.runtime.sendMessage({
+        loggedOut: "true"
+    }, function(response) {
+        // console.log(response.farewell);
+    });
+
+
+} else if (newUser == "true" && oauthToken != "null") {
+    console.log('page completed loading, we just got authenticated')
     chrome.runtime.sendMessage({
         url: url,
         title: document.title,
@@ -34,31 +43,20 @@ if (newUser == "true" && oauthToken != "null") {
     });
 
     localStorage.setItem('newUser', 'false');
-} else if(email == ""){
-	console.log('we must have pressed LOGOUT')
-
-	chrome.runtime.sendMessage({
-	    loggedOut: "true"
-	}, function(response) {
-	    // console.log(response.farewell);
-	});
-
-
 } else if (oauthToken == "null") {
-	console.log('oauthToken === null')
-	console.log('oauthToken = ', oauthToken)
-	localStorage.setItem("newUser", "")
+    console.log('oauthToken === null')
+    console.log('oauthToken = ', oauthToken)
+    localStorage.setItem("newUser", "")
 
 } else {
-	console.log('we have a valid title and we arent a new user')
-	chrome.runtime.sendMessage({
-	    url: url,
-	    title: title,
-	    newUser: "false"
-	}, function(response) {
-	    // console.log(response.farewell);
-	});
-	console.log('TRY THIS AGAIN we have a valid title and we arent a new user')
+    console.log('we have a valid title and we arent a new user')
+    chrome.runtime.sendMessage({
+        url: url,
+        title: title,
+        newUser: "false"
+    }, function(response) {
+        // console.log(response.farewell);
+    });
 
 
 }

@@ -19,7 +19,6 @@
 *.rar
 *.tar
 *.zip
-/keys.js
 
 # Logs and databases #
 ######################

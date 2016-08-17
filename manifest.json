@@ -2,12 +2,12 @@
   "manifest_version": 2,
   "name": "Browser Stream",
   "description": "Stream your browsing history. Creep on your friends. What do you have to hide?",
-  "version": "3.7",
+  "version": "3.8",
   "icons": {
-    "128": "firebase.png"
+    "128": "browser-stream.png"
   },
   "browser_action": {
-    "default_icon": "firebase.png",
+    "default_icon": "browser-stream.png",
     "default_popup": "popup.html"
   },
   "background": {

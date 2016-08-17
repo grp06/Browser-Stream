@@ -5,7 +5,7 @@
 **Download The Chrome Extension**: https://chrome.google.com/webstore/detail/browser-stream/pbooekpnojnohngeefoiiefofgojendf
 
 
-**Live Web App**: http://pickettg.me/browser-stream
+**Live Web App**: http://browserstream.io
 
 
 ### **Technologies used:**
